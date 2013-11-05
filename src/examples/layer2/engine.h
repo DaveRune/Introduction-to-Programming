@@ -201,7 +201,7 @@ namespace octet {
 
         app_scene->render(object_shader, skin_shader, *cam, (float)vx / vy);
 
-        overlay.render(object_shader, skin_shader, vx, vy);
+        overlay.render(object_shader, skin_shader, vx, vy, get_frame_number());
       }
     }
   };

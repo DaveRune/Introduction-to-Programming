@@ -181,6 +181,7 @@ namespace octet {
       set_viewport_size(rect.right - rect.left, rect.bottom - rect.top);
 
       draw_world(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+      inc_frame_number();
 
       SwapBuffers(hdc);
 
@@ -288,7 +289,8 @@ namespace octet {
         Sleep(1000/30);
 
         for (int i = 0; i != m.size(); ++i) {
-          if (m.key(i)) m.value(i)->render();
+          // note: because Win8 generates an invisible window, we need to check m.value(i)
+          if (m.key(i) && m.value(i)) m.value(i)->render();
         }
 
         Fake_AL_context()->update();

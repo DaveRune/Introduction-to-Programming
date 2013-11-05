@@ -129,6 +129,7 @@ static char *get_sprintf_buffer() {
 #include "../resources/resource.h"
 #include "../resources/resources.h"
 #include "../resources/gl_resource.h"
+#include "../resources/bitmap_font.h"
 #include "../resources/mesh_builder.h"
 
 // shaders
@@ -137,6 +138,8 @@ static char *get_sprintf_buffer() {
 #include "../shaders/texture_shader.h"
 #include "../shaders/phong_shader.h"
 #include "../shaders/bump_shader.h"
+
+#include "../physics/physics.h"
 
 // scene
 #include "../scene/scene_node.h"
@@ -155,6 +158,7 @@ static char *get_sprintf_buffer() {
 #include "../scene/displacement_map.h"
 #include "../scene/indexer.h"
 #include "../scene/smooth.h"
+#include "../scene/mesh_text.h"
 #include "../scene/wireframe.h"
 
 // high level helpers
@@ -172,7 +176,7 @@ static char *get_sprintf_buffer() {
 
 namespace octet {
   inline resource *resource::new_type(atom_t type) {
-    switch (type) {
+    switch ((int)type) {
       #define OCTET_CLASS(X) case atom_##X: return new X();
       #include "../resources/classes.h"
       #undef OCTET_CLASS
@@ -181,4 +185,3 @@ namespace octet {
   }
 }
 
-#include "../physics/physics.h"

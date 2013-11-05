@@ -16,7 +16,6 @@
 //
 
 namespace octet {
-
   class box {
     // where is our box (overkill for a ping game!)
     mat4t modelToWorld;
@@ -29,120 +28,69 @@ namespace octet {
 
     // what color is our box
     vec4 color;
-
-    int texture;
-
   public:
-
-    
-
-		bool _state;
-
-		// These floats contain the world position of the box
-		float worldX, worldY;
-
     box() {
-		int bomb = 4;
     }
-
-		void enabled(bool state) {
-			_state = state;
-		}
 
     void init(const vec4 &_color, float x, float y, float w, float h) {
       modelToWorld.loadIdentity();
       modelToWorld.translate(x, y, 0);
-			worldX = x;
-			worldY = y;
       halfWidth = w * 0.5f;
       halfHeight = h * 0.5f;
       color = _color;
-			_state = true;
-    }
-
-    void init(int _texture, float x, float y, float w, float h) {
-      modelToWorld.loadIdentity();
-      modelToWorld.translate(x, y, 0);
-			worldX = x;
-			worldY = y;
-      halfWidth = w * 0.5f;
-      halfHeight = h * 0.5f;
-      texture = _texture;
-			_state = true;
     }
 
     void render(color_shader &shader, mat4t &cameraToWorld) {
-			if(_state) {
-				// build a projection matrix: model -> world -> camera -> projection
-				// the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-				mat4t modelToProjection = mat4t::build_projection_matrix(modelToWorld, cameraToWorld);
+      // build a projection matrix: model -> world -> camera -> projection
+      // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
+      mat4t modelToProjection = mat4t::build_projection_matrix(modelToWorld, cameraToWorld);
 
-				// set up the uniforms for the shader
-				shader.render(modelToProjection, color);
+      // set up the uniforms for the shader
+      shader.render(modelToProjection, color);
 
-				// this is an array of the positions of the corners of the box in 3D
-				// a straight "float" here means this array is being generated here at runtime.
-				float vertices[] = {
-					-halfWidth, -halfHeight, 0,
-					 halfWidth, -halfHeight, 0,
-					 halfWidth,  halfHeight, 0,
-					-halfWidth,  halfHeight, 0,
-				};
+      // this is an array of the positions of the corners of the box in 3D
+      // a straight "float" here means this array is being generated here at runtime.
+      float vertices[] = {
+        -halfWidth, -halfHeight, 0,
+         halfWidth, -halfHeight, 0,
+         halfWidth,  halfHeight, 0,
+        -halfWidth,  halfHeight, 0,
+      };
 
-				// attribute_pos (=0) is position of each corner
-				// each corner has 3 floats (x, y, z)
-				// there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
-				glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
-				glEnableVertexAttribArray(attribute_pos);
+      // attribute_pos (=0) is position of each corner
+      // each corner has 3 floats (x, y, z)
+      // there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
+      glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
+      glEnableVertexAttribArray(attribute_pos);
     
-				// finally, draw the box (4 vertices)
-				glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-			}
+      // finally, draw the box (4 vertices)
+      glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
 
     // move the object
     void translate(float x, float y) {
       modelToWorld.translate(x, y, 0);
-			worldX += x;
-			worldY += y;
     }
 
     // position the object relative to another.
     void set_relative(box &rhs, float x, float y) {
       modelToWorld = rhs.modelToWorld;
       modelToWorld.translate(x, y, 0);
-			worldX = rhs.worldX + x;
-			worldY = rhs.worldY + y;
     }
 
     // return true if this box collides with another.
     // note the "const"s which say we do not modify either box
     bool collides_with(const box &rhs) const {
+      float dx = rhs.modelToWorld[3][0] - modelToWorld[3][0];
+      float dy = rhs.modelToWorld[3][1] - modelToWorld[3][1];
 
-		 if (rhs._state) {
-			float dx = rhs.modelToWorld[3][0] - modelToWorld[3][0];
-			float dy = rhs.modelToWorld[3][1] - modelToWorld[3][1];
-
-			// both distances have to be under the sum of the halfwidths
-			// for a collision
-			return
-			(fabsf(dx) < halfWidth + rhs.halfWidth) &&
-			(fabsf(dy) < halfHeight + rhs.halfHeight)
-			;
-		 }
-		 else return false;
-		 
-
-		//float dx = rhs.modelToWorld[3][0] - modelToWorld[3][0];
-		//float dy = rhs.modelToWorld[3][1] - modelToWorld[3][1];
-
-		//// both distances have to be under the sum of the halfwidths
-		//// for a collision
-		//return
-		//	(fabsf(dx) < halfWidth + rhs.halfWidth) &&
-		//	(fabsf(dy) < halfHeight + rhs.halfHeight)
-		//;
-		}
+      // both distances have to be under the sum of the halfwidths
+      // for a collision
+      return
+        (fabsf(dx) < halfWidth + rhs.halfWidth) &&
+        (fabsf(dy) < halfHeight + rhs.halfHeight)
+      ;
+    }
   };
 
   class ping_app : public octet::app {
@@ -155,16 +103,15 @@ namespace octet {
 
     // what state is the game in?
     enum state_t {
-      num_sound_sources = 8,
-      state_serving,
+      state_serving_left,
+      state_serving_right,
       state_playing,
       state_game_over
     };
     state_t state;
 
     // counters for scores
-    int score;
-		int maxScore;
+    int scores[2];
 
     // game objects
 
@@ -172,20 +119,10 @@ namespace octet {
     box court[4];
 
     // bats
-    box bat[1];
-
-		// blocks
-		box block[24];
+    box bat[2];
 
     // the ball
     box ball;
-
-		// Sounds
-		ALuint bounce, fail, blockBreak;
-		unsigned cur_source;
-		ALuint sources[num_sound_sources];
-
-    ALuint get_sound_source() { return sources[cur_source++ % num_sound_sources]; }
 
     // velocity of the ball
     float ball_velocity_x;
@@ -193,44 +130,36 @@ namespace octet {
 
     // move the objects before drawing
     void simulate() {
-
-      if(is_key_down('M')) {
-        printf("Sound Play\n");
-
-        ALuint source = get_sound_source();
-        alSourcei(source, AL_BUFFER, bounce);
-        alSourcePlay(source);
+      // W and S move the left bat
+      if (is_key_down('W')) {
+        bat[0].translate(0, +0.1f);
+      } else if (is_key_down('S')) {
+        bat[0].translate(0, -0.1f);
       }
 
-      // AD & <> To move the bat
-      if (is_key_down('A') || is_key_down(key_left)) {
-        bat[0].translate(-0.1f, 0);
-      } else if (is_key_down('D') || is_key_down(key_right)) {
-        bat[0].translate(+0.1f, 0);
+      // up and down arrow move the right bat
+      if (is_key_down(key_up)) {
+        bat[1].translate(0, +0.1f);
+      } else if (is_key_down(key_down)) {
+        bat[1].translate(0, -0.1f);
       }
 
-			// Clamp the bat to the scene
-			if(bat[0].worldX > 4.3f) {
-				float xDiff = bat[0].worldX - 4.3f;
-				bat[0].translate(-xDiff, 0);
-			}
-			else if (bat[0].worldX < -4.3f) {
-				float xDiff = bat[0].worldX - -4.3f;
-				bat[0].translate(-xDiff, 0);
-			}
-
-      if (state == state_serving) {
-        // if we are serving, glue the ball to the bat
-        ball.set_relative(bat[0], 0, 0.3f);
+      if (state == state_serving_left) {
+        // if we are serving, glue the ball to the left bat
+        ball.set_relative(bat[0], 0.3f, 0);
         if (is_key_down(key_space)) {
           // space serves, changing the state
           state = state_playing;
-
-					// Randomise if the ball is shot left or right
-					int x = rand()%2;
-					if(!x) x-=1;
-
-          ball_velocity_x = 0.1f * x;
+          ball_velocity_x = 0.1f;
+          ball_velocity_y = 0.1f;
+        }
+      } else if (state == state_serving_right) {
+        // if we are serving, glue the ball to the right bat
+        ball.set_relative(bat[1], -0.3f, 0);
+        if (is_key_down(key_space)) {
+          // space serves, changing the state
+          state = state_playing;
+          ball_velocity_x = -0.1f;
           ball_velocity_y = 0.1f;
         }
       } else if (state == state_playing) {
@@ -238,66 +167,27 @@ namespace octet {
         ball.translate(ball_velocity_x, ball_velocity_y);
 
         // check collision with the bats
-        if (ball_velocity_y < 0 && ball.collides_with(bat[0])) {
-          ball_velocity_y = -ball_velocity_y;
+        if (ball_velocity_x > 0 && ball.collides_with(bat[1])) {
+          // to avoid internal bounces, only check the bats
+          ball_velocity_x = -ball_velocity_x;
+        } else if (ball_velocity_x < 0 && ball.collides_with(bat[0])) {
+          ball_velocity_x = -ball_velocity_x;
         }
 
         // check collision with the court top and bottom
         if (ball_velocity_y > 0 && ball.collides_with(court[1])) {
           ball_velocity_y = -ball_velocity_y;
-          ALuint source = get_sound_source();
-          alSourcei(source, AL_BUFFER, bounce);
-          alSourcePlay(source);
         } else if (ball_velocity_y < 0 && ball.collides_with(court[0])) {
-					state = state_serving;
-          ALuint source = get_sound_source();
-          alSourcei(source, AL_BUFFER, fail);
-          alSourcePlay(source);
+          ball_velocity_y = -ball_velocity_y;
         }
-
-				// Check Collision with blocks
-				for(int i = 0; i < 24; i++) {
-					if(ball.collides_with(block[i])) {
-						// Create vectors for Ball and Block position
-						vec2 blockPos = vec2(block[i].worldX, block[i].worldY);
-						vec2 ballPos = vec2(ball.worldX, ball.worldY);
-
-						// Calculate the difference to get a collision offset
-						float xDiff = blockPos[0] - ballPos[0];
-						float yDiff = blockPos[1] - ballPos[1];
-
-						// if ball hits the top or bottom of the bat bounce in Y else X
-						if(yDiff > 0.2f || yDiff < -0.2f) {
-							ball_velocity_y = -ball_velocity_y;
-						} else {
-							ball_velocity_x = -ball_velocity_x;
-						}
-						
-						block[i].enabled(false);
-            ALuint source = get_sound_source();
-            alSourcei(source, AL_BUFFER, blockBreak);
-            alSourcePlay(source);
-						score++;
-						
-						if(score == maxScore) {
-							printf("Game Complete\n\n");
-							state = state_serving;
-						}
-
-					}
-				}
 
         // check collision with the court end zones
         if (ball.collides_with(court[2])) {
-					ball_velocity_x = -ball_velocity_x;
-          ALuint source = get_sound_source();
-          alSourcei(source, AL_BUFFER, bounce);
-          alSourcePlay(source);
+          scores[0]++;
+          state = scores[0] >= 10 ? state_game_over : state_serving_left;
         } else if (ball.collides_with(court[3])) {
-					ball_velocity_x = -ball_velocity_x;
-          ALuint source = get_sound_source();
-          alSourcei(source, AL_BUFFER, bounce);
-          alSourcePlay(source);
+          scores[1]++;
+          state = scores[1] >= 10 ? state_game_over : state_serving_right;
         }
       }
     }
@@ -315,44 +205,15 @@ namespace octet {
       cameraToWorld.translate(0, 0, 5);
 
       ball.init(vec4(1, 0, 0, 1), 0, 0, 0.25f, 0.25f);
-      bat[0].init(vec4(1, 1, 0, 1), 0, -3.7, 1.0f, 0.2f);
+      bat[0].init(vec4(1, 1, 0, 1), -4.7f, 0, 0.2f, 1.0f);
+      bat[1].init(vec4(0, 0, 1, 1),  4.7f, 0, 0.2f, 1.0f);
       court[0].init(vec4(1, 1, 1, 1), 0, -4, 10, 0.1f);
       court[1].init(vec4(1, 1, 1, 1), 0,  4, 10, 0.1f);
       court[2].init(vec4(1, 1, 1, 1), -5, 0, 0.2f, 8);
       court[3].init(vec4(1, 1, 1, 1), 5,  0, 0.2f, 8);
 
-			// Calculate the rows and columns
-			const int rowCount = 6, columnCount = 3;
-			maxScore = rowCount*columnCount;
-			const int blocks = rowCount*columnCount;
-			// The position of the first Block (Top Left)
-			const float xPos = -4, yPos = 3.2f;
-
-			const float rowSpace = ((xPos * -1) *2) / (rowCount -1);
-
-			int blockCount = 0;
-
-      GLuint brickGraphic = resources::get_texture_handle(GL_RGBA, "assets/invaderers/ship.gif");
-
-			// Create the grid
-			for(int columns = 0; columns < columnCount; columns++)
-			{
-				for(int rows = 0; rows < rowCount; rows++) {
-					block[blockCount].init(vec4(1,0,1,1), xPos + (rowSpace * rows), yPos - (0.7f*columns), 1.0f, 0.5f);
-					blockCount++;
-				}
-			}
-
-      // sounds
-
-      bounce = resources::get_sound_handle(AL_FORMAT_MONO16, "assets/pingsounds/bounce.wav");
-      fail = resources::get_sound_handle(AL_FORMAT_MONO16, "assets/pingsounds/fail.wav");
-      blockBreak = resources::get_sound_handle(AL_FORMAT_MONO16, "assets/pingsounds/break.wav");
-      cur_source = 0;
-      alGenSources(num_sound_sources, sources);
-
-      state = state_serving;
-      score = 0;
+      state = state_serving_left;
+      scores[0] = scores[1] = 0;
     }
 
     // this is called to draw the world
@@ -372,12 +233,6 @@ namespace octet {
       // draw the ball
       ball.render(color_shader_, cameraToWorld);
 
-			//draw the blocks
-			for(int i = 0; i < 24; i++)
-			{
-				block[i].render(color_shader_, cameraToWorld);
-			}
-
       // draw the bats
       for (int i = 0; i != 2; ++i) {
         bat[i].render(color_shader_, cameraToWorld);
@@ -387,11 +242,6 @@ namespace octet {
       for (int i = 0; i != 4; ++i) {
         court[i].render(color_shader_, cameraToWorld);
       }
-
-      // move the listener with the camera
-      vec4 &cpos = cameraToWorld.w();
-      alListener3f(AL_POSITION, cpos.x(), cpos.y(), cpos.z());
-
     }
   };
 }
