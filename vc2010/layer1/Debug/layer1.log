@@ -1,22 +1,14 @@
-﻿Build started 09/11/2013 05:12:07.
+﻿Build started 09/11/2013 23:34:26.
      1>Project "C:\Users\David Knight\Documents\GitHub\Introduction-to-Programming\vc2010\layer1\layer1.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\layer1.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\src /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\src\examples\layer1\main.cpp
          main.cpp
-     1>c:\users\david knight\documents\github\introduction-to-programming\src\examples\layer1\breakout\breakout_app.h(404): warning C4305: 'argument' : truncation from 'double' to 'float'
-       Link:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\David Knight\Documents\GitHub\Introduction-to-Programming\vc2010\layer1\Debug\layer1.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:..\..\lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\layer1.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\David Knight\Documents\GitHub\Introduction-to-Programming\vc2010\layer1\Debug\layer1.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\David Knight\Documents\GitHub\Introduction-to-Programming\vc2010\layer1\Debug\layer1.lib" /MACHINE:X86 Debug\main.obj
-     1>main.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
-         layer1.vcxproj -> C:\Users\David Knight\Documents\GitHub\Introduction-to-Programming\vc2010\layer1\Debug\layer1.exe
-       Manifest:
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\David Knight\Documents\GitHub\Introduction-to-Programming\vc2010\layer1\Debug\layer1.exe;#1" /manifest Debug\layer1.exe.intermediate.manifest
-       FinalizeBuildStatus:
-         Deleting file "Debug\layer1.unsuccessfulbuild".
-         Touching "Debug\layer1.lastbuildstate".
-     1>Done Building Project "C:\Users\David Knight\Documents\GitHub\Introduction-to-Programming\vc2010\layer1\layer1.vcxproj" (build target(s)).
+     1>c:\users\david knight\documents\github\introduction-to-programming\src\examples\layer1\breakout\breakout_app.h(285): error C2512: 'octet::app' : no appropriate default constructor available
+     1>c:\users\david knight\documents\github\introduction-to-programming\src\examples\layer1\breakout\breakout_app.h(427): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>Done Building Project "C:\Users\David Knight\Documents\GitHub\Introduction-to-Programming\vc2010\layer1\layer1.vcxproj" (build target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:06.53
+Time Elapsed 00:00:03.36

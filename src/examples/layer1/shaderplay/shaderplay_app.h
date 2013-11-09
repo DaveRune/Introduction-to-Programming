@@ -36,7 +36,7 @@ namespace octet {
       // set up the matrices with a camera 5 units from the origin
       modelToWorld.loadIdentity();
       cameraToWorld.loadIdentity();
-      cameraToWorld.translate(0, 0, 5);
+      cameraToWorld.translate(0, 0, 1);
 
       // use helper function to generate an OpenGL texture
       texture_handle_ = resources::get_texture_handle(GL_RGB, "!bricks");
@@ -64,9 +64,30 @@ namespace octet {
       // set up opengl to draw textured triangles using sampler 0 (GL_TEXTURE0)
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, texture_handle_);
-      play_shader_.render(modelToProjection, 0);
 
-      static float halfSize = 4.8f;
+      static float sinMultiplier = 0.0f;
+      static int loopCount = 0;
+      const int loopDelay = 1;
+      const float incValue = 0.5f;
+      const float maxMultiplier = 10.0f;
+
+      if(loopCount >= loopDelay)
+      {
+        loopCount = 0;
+        sinMultiplier += incValue;
+        
+        sinMultiplier = (sinMultiplier > maxMultiplier) ? 0.0f : sinMultiplier;
+      }
+      else
+      {
+        loopCount++;
+      }
+
+      play_shader_.render(modelToProjection, 0, w, h, sinMultiplier);
+
+      //texture_shader_.render(modelToProjection, 0);
+
+      static float halfSize = 1.0f;
 
       // this is an array of the positions of the corners of the texture in 3D
       static const float vertices[] = {
@@ -95,7 +116,17 @@ namespace octet {
       // there is no gap between the 2 floats and hence the stride is 2*sizeof(float)
       glVertexAttribPointer(attribute_uv, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)uvs );
       glEnableVertexAttribArray(attribute_uv);
+
+      static const float colors[] = {
+        1.0f, 0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0, 1.0f,
+        0.0f, 0.0f, 1.0f, 1.0f,
+        1.0f, 0.0f, 1.0, 1.0f,
+      };
     
+      glVertexAttribPointer(attribute_color, 4, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)colors );
+      glEnableVertexAttribArray(attribute_color);
+
       // finally, draw the texture (3 vertices)
       glDrawArrays(GL_QUADS, 0, 4);
     }

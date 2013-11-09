@@ -15,6 +15,7 @@
 //
 //
 
+
 namespace octet {
 
   class color_brick {
@@ -224,6 +225,8 @@ namespace octet {
     }
   };
 
+
+
   class breakout_app : public octet::app {
     // Matrix to transform points in our camera space to the world.
     // This lets us move our camera
@@ -272,6 +275,8 @@ namespace octet {
     // velocity of the ball
     float ball_velocity_x;
     float ball_velocity_y;
+
+    public:
 
     // move the objects before drawing
     void simulate() {
