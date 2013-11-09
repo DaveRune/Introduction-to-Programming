@@ -19,7 +19,7 @@ namespace octet {
   class shaderplay_app : public octet::app {
     mat4t modelToWorld;              // this matrix converts from model space to world space
     mat4t cameraToWorld;             // this matrix converts from camera space to world space
-    texture_shader texture_shader_; // this builds a shader to use with textures
+    play_shader play_shader_; // this builds a shader to use with textures
     GLuint texture_handle_;         // this is an OpenGL texture handle which is used to draw the image.
 
   public:
@@ -31,7 +31,7 @@ namespace octet {
     // this is called once OpenGL is initialized
     void app_init() {
       // set up the shader
-      texture_shader_.init();
+      play_shader_.init();
 
       // set up the matrices with a camera 5 units from the origin
       modelToWorld.loadIdentity();
@@ -64,7 +64,7 @@ namespace octet {
       // set up opengl to draw textured triangles using sampler 0 (GL_TEXTURE0)
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, texture_handle_);
-      texture_shader_.render(modelToProjection, 0);
+      play_shader_.render(modelToProjection, 0);
 
       static float halfSize = 4.8f;
 

@@ -199,6 +199,9 @@
     <ClInclude Include="..\..\src\examples\layer1\shaderplay\shaderplay_app.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\shaders\play_shader.h">
+      <Filter>octet\shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\resources\mesh_builder.inl">
