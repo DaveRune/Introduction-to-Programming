@@ -21,6 +21,7 @@
 #include "bump/bump_app.h"
 #include "physics/physics_app.h"
 #include "breakout/breakout_app.h"
+#include "shaderplay/shaderplay_app.h"
 
 
 namespace octet {
@@ -36,6 +37,7 @@ namespace octet {
     else if (!strcmp(name, "bump")) return new bump_app(argc, argv);       //  bump map sample: continue here to learn how to draw bump mapped textures
     else if (!strcmp(name, "physics")) return new physics_app(argc, argv); //  physics sample: continue here to learn how to annimate using physics
     else if (!strcmp(name, "breakout")) return new breakout_app(argc, argv); //  My Breakout Game - Intro to Programming
+    else if (!strcmp(name, "shaderplay")) return new shaderplay_app(argc, argv); //  My Shader Experiments
     else return 0;
   }
 

@@ -196,6 +196,9 @@
     <ClInclude Include="..\..\src\examples\layer1\ping\ping_app.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\examples\layer1\shaderplay\shaderplay_app.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\resources\mesh_builder.inl">
